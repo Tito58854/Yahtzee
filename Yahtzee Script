@@ -1,0 +1,291 @@
+#Documentaion is only written on round 1 and part of round 2, this is due to the fact that the majority of code for round 1 is duplicated to rounds 2 cand 3 with few, but documented exceptions. Documentaion was done with target audience in mind, but may be missing some explanations. If documentation wasn't clear enough I would like some feedback or suggestions on how to simplify and clan up the code as well. Thank you, this is my first written program with a lot of trial and error. I am looking forward to develop and possibly create a scoring system along with it.
+
+
+# Stylized print function that slows typing for a user friendly experience
+
+import sys,time    
+def slow(str):
+   for i in str + '\n':
+     sys.stdout.write(i)
+     sys.stdout.flush()
+     time.sleep(2./60)
+    
+
+
+# DiceRoll Class with an init function and roll, init could possibly be developed later for more die faces
+
+import random
+class DiceRoll:
+    def __init__(self):
+        self.diefaces = 6
+        
+    def roll(self):
+        return random.randint(1,self.diefaces)
+        
+
+#Saveroll class holds 3 functions, init function to receieve user input, printrolls function to display and verify user choice(s), and saveroll to save chosen values for future rounds. saveroll() reads user input, splits str, converts str to int, checks amount of die chosen, uses if statements to verify formula needed (based on len() of list), then appends chosen values from one list to a secondary list
+
+class SaveRoll:
+    def __init__(self, chosen_die):
+        self.chosendie = chosen_die
+        
+    def printrolls(self):
+        roll_reference = (self.chosendie.split())
+        return roll_reference
+    
+    def saveroll(self):
+        global init_dicerolls
+        global temp_rolls
+        roll_reference_init = (self.chosendie.split())
+        roll_reference = []
+        
+        
+        #Checks for duplicate die choices and only appends non-duplicates to ensure desired gameplay, then all appended choices are converted to integers for the next step.
+        for i in range(0,len(roll_reference_init)):
+            if roll_reference_init[i] not in roll_reference:
+                roll_reference.append(int(roll_reference_init[i]))
+        
+            
+        
+    #Checks length of user input and translates die chosen into the correct values from the initial list (init_dicerolls).
+        if len(roll_reference) == 1:
+            temp_rolls.append(init_dicerolls[roll_reference[0]-1])
+        elif len(roll_reference) == 2:
+            temp_rolls.append(init_dicerolls[roll_reference[0]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[1]-1])
+        elif len(roll_reference) == 3:
+            temp_rolls.append(init_dicerolls[roll_reference[0]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[1]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[2]-1])
+        elif len(roll_reference) == 4:
+            temp_rolls.append(init_dicerolls[roll_reference[0]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[1]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[2]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[3]-1])
+        elif len(roll_reference) == 5:
+            temp_rolls.append(init_dicerolls[roll_reference[0]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[1]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[2]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[3]-1])
+            temp_rolls.append(init_dicerolls[roll_reference[4]-1])
+
+
+        
+
+slow('Welcome to the game of YAHTZEE!\n')
+gamestart = ''
+
+#While loop breaks only continues if ' ' is entered
+while gamestart != ' ':        
+    gamestart = input('When ready press SPACE to begin game. \n')    
+
+
+#Two lists are created for value transfers between them and DiceRoll class is initiated     
+init_dicerolls = []
+temp_rolls = []
+init_roll = DiceRoll()
+
+
+
+#For loop used to simulate 5 dice tossed, calling the roll function each time, and appending each roll to init_dicerolls[]
+for i in range (0,5):
+    init_dicerolls.append(init_roll.roll())
+
+
+
+slow(f'Your initial rolls are: {init_dicerolls}')
+print('')
+
+#Round 1 checkpoints begin, using multiple while loops and if statements to catch incorrect values, incorrect formatting, confirm user's choice's, and allowing for complete reroll of all dice.
+
+#1st while loop check point ensures correct formatting, correct amount of die chosen, and only integers are entered.
+checkpoint_1a = False
+while checkpoint_1a == False:
+    #2nd while loop is dependent on user input if user answers no when asked "You have chosen the dice {saves1.printrolls()}. Is that correct?" it will loop back here. If yes is the input, code will continue to execute.
+    checkpoint_1b = False
+    while checkpoint_1b == False:
+        temp_save = input("Enter position #'s (1-5) of die you'd like to save with a space in between. EX: 1 3 5 \n")
+        saves1 = SaveRoll(temp_save)
+        print('')
+
+        
+        #3rd while loop ensures only valid input is entered when asked "You have chosen the dice {saves1.printrolls()}. Is that correct?". If anything other than yes or no is entered, it will loop back here.
+        round1_quest = ''
+        checkpoint_1c = False
+        while checkpoint_1c == False:
+            round1_quest = input(f'You have chosen the dice {saves1.printrolls()}. Is that correct? ' + f'yes or no?' + '\n')
+            print('')
+            if round1_quest in ('yes', 'Yes'):
+                checkpoint_1b = True
+                checkpoint_1c = True
+            elif round1_quest in ('no', 'No'):
+                checkpoint_1b = False
+                checkpoint_1c = True
+            else:
+                pass
+        #if statement ensures correct amount of die chosen, followed by a try and except statement for any non_integer values.
+        if len(temp_save) in range (1,10):
+            try:
+                input_check = temp_save.split()
+                for i in range(0,len(input_check)):
+                    input_check[i] = int(input_check[i])
+                    checkpoint_1a = True
+            except ValueError:
+                slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
+                checkpoint_1a = False
+        elif len(temp_save) > 9:
+            slow('Number of die chosen exceeded, only 5 allowed.')
+            
+        else:
+            checkpoint_1a = True
+            
+        
+        
+#After all three checkpoints test as True, saveroll() function is called and saved values are added to the temp_rolls list to be displayed to user.
+saves1.saveroll()
+slow(f'Your saved rolls are {temp_rolls}.')
+print('')
+
+
+#Pauses created to increase user interaction and allow user to step away until ready to continue.
+round_start = ''
+while round_start != ' ':        
+    round_start = input('When ready press SPACE to start round 1 rolls. \n')
+
+
+#Round 2 start with new rolls based on how many were saved        
+for i in range(0,5 - len(temp_rolls)):
+    temp_rolls.append(init_roll.roll())
+
+
+#New rolls are saved back onto original list (init_dicerolls), this is to prepare for the upcoming function call to saveroll().
+init_dicerolls = temp_rolls
+slow(f'Your rolls are: {init_dicerolls}')
+print('')
+
+    
+checkpoint_2a = False
+while checkpoint_2a == False:
+    checkpoint_2b = False
+    while checkpoint_2b == False:
+        temp_save2 = input("Enter position #'s (1-5) of die you'd like to save with a space in between. EX: 1 3 5 \n")
+        saves2 = SaveRoll(temp_save2)
+        print('')
+
+        round2_quest = ''
+        checkpoint_2c = False
+        while checkpoint_2c == False:
+            round2_quest = input(f'You have chosen the dice {saves2.printrolls()}. Is that correct? ' + f'yes or no?' + '\n')
+            print('')
+            if round2_quest in ('yes', 'Yes'):
+                checkpoint_2b = True
+                checkpoint_2c = True
+            elif round2_quest in ('no', 'No'):
+                checkpoint_2b = False
+                checkpoint_2c = True
+            else:
+                pass
+
+        if len(temp_save2) in range (1,10):
+            try:
+                input_check = temp_save2.split()
+                for i in range(0,len(input_check)):
+                    input_check[i] = int(input_check[i])
+                    checkpoint_2a = True
+            except ValueError:
+                slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
+                checkpoint_2a = False
+        elif len(temp_save) > 9:
+            slow('Number of die chosen exceeded, only 5 allowed.')
+        else:
+            checkpoint_2a = True
+
+#Since rolls were moved to the list(init_dicerolls), the function(saveroll()) uses init_dicerolls as the main data list, which then begins to append any saved rolls back to the now empty temp_rolls list 
+temp_rolls = []
+saves2.saveroll()
+
+
+slow(f'Your saved rolls are {temp_rolls}.')
+print('')
+
+
+
+round_start = ''
+while round_start != ' ':        
+    round_start = input('When ready press SPACE to start round 2 rolls. \n') 
+    
+#Round 3
+
+
+for i in range(0,5 - len(temp_rolls)):
+    temp_rolls.append(init_roll.roll())
+
+
+init_dicerolls = temp_rolls
+slow(f'Your rolls are: {init_dicerolls}')
+print('')
+
+    
+checkpoint_3a = False
+while checkpoint_3a == False:
+    checkpoint_3b = False
+    while checkpoint_3b == False:
+        temp_save3 = input("Enter position #'s (1-5) of die you'd like to save with a space in between. EX: 1 3 5 \n")
+        saves3 = SaveRoll(temp_save3)
+        print('')
+
+        round3_quest = ''
+        checkpoint_3c = False
+        while checkpoint_3c == False:
+            round3_quest = input(f'You have chosen the dice {saves3.printrolls()}. Is that correct? ' + f'yes or no?' + '\n')
+            print('')
+            if round3_quest in ('yes', 'Yes'):
+                checkpoint_3b = True
+                checkpoint_3c = True
+            elif round3_quest in ('no', 'No'):
+                checkpoint_3b = False
+                checkpoint_3c = True
+            else:
+                pass
+
+        if len(temp_save3) in range (1,10):
+            try:
+                input_check = temp_save.split()
+                for i in range(0,len(input_check)):
+                    input_check[i] = int(input_check[i])
+                    checkpoint_3a = True
+            except ValueError:
+                slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
+                checkpoint_1a = False
+        elif len(temp_save) > 9:
+            slow('Number of die chosen exceeded, only 5 allowed.')
+        else:
+            checkpoint_3a = True
+            
+temp_rolls = []
+saves3.saveroll()
+slow(f'Your saved rolls are {temp_rolls}.')
+print('')
+
+round_start = ''
+while round_start != ' ':        
+    round_start = input('When ready press SPACE to start final roll(s). \n')
+
+# Final Round
+
+
+        
+for i in range(0,5 - len(temp_rolls)):
+    temp_rolls.append(init_roll.roll())
+
+
+#Sort function used on final roll display, may use later to develop a scoring system.    
+init_dicerolls = temp_rolls
+init_dicerolls.sort()
+slow(f'Your final rolls are: {init_dicerolls}')
+print('')
+
+
+slow(f'Congratulations you have finished your final roll. ')
+
+    
