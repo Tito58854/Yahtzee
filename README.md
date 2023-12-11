@@ -1,10 +1,11 @@
 # Yahtzee
 Beginner Project -Yahtzee Game Dice Roller
+
 Yahtzee Scorecard and Rules needed:
 Scorecard:
-  https://www.memory-improvement-tips.com/yahtzee-score-sheets.html
+https://www.memory-improvement-tips.com/yahtzee-score-sheets.html
 Rules:
-  https://www.dicegamedepot.com/yahtzee-rules/
+https://www.dicegamedepot.com/yahtzee-rules/
 
 The project I chose was a dice simulation for the use in a game of Yahtzee, the program is a standalone simulation of what it would be like to roll 5 dice at time, while allowing the user to save specific dice rolls over the course of three rounds. As of now the program does not keep track of scoring and must be used in conjunction with a Yahtzee scorecard . However, the complexity of analyzing user input and ensuring no crashes take place was the main focus of this program. 
 
