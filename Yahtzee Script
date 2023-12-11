@@ -7,7 +7,7 @@ def slow(str):
    for i in str + '\n':
      sys.stdout.write(i)
      sys.stdout.flush()
-     time.sleep(2./60)
+     time.sleep(1./60)
     
 
 
@@ -41,8 +41,10 @@ class SaveRoll:
         
         #Checks for duplicate die choices and only appends non-duplicates to ensure desired gameplay, then all appended choices are converted to integers for the next step.
         for i in range(0,len(roll_reference_init)):
-            if roll_reference_init[i] not in roll_reference:
-                roll_reference.append(int(roll_reference_init[i]))
+            roll_reference_init[i] = int(roll_reference_init[i])
+        for i in roll_reference_init:     
+            if i not in roll_reference:
+                roll_reference.append(i)
         
             
         
@@ -95,71 +97,84 @@ for i in range (0,5):
 slow(f'Your initial rolls are: {init_dicerolls}')
 print('')
 
-#Round 1 checkpoints begin, using multiple while loops and if statements to catch incorrect values, incorrect formatting, confirm user's choice's, and allowing for complete reroll of all dice.
+#Round 1 checkpoints begin, using multiple while loops, if statements, and try and except statements to catch incorrect values, incorrect formatting, limit amount of die choices, values outside of 1-5, confirm user's choice's, and allowing for complete reroll of all dice.
 
-#1st while loop check point ensures correct formatting, correct amount of die chosen, and only integers are entered.
-checkpoint_1a = False
-while checkpoint_1a == False:
-
-
-
-    #2nd while loop is dependent on user input if user answers no when asked "You have chosen the dice {saves1.printrolls()}. Is that correct?" it will loop back here. If yes is the input, code will continue to execute.
-    checkpoint_1b = False
-    while checkpoint_1b == False:
-        temp_save = input(slow("Enter position number of dice you'd like to save. 1st die is 1, 2nd die is 2, 3rd die is 3 etc. There MUST be a space in between each number. Example of correct format: 1 3 5 \n"))
-        saves1 = SaveRoll(temp_save)
-        print('')
+#1st while loop allows program to decide what issues or incorrect inputs that should push the user back to this point.
+checkpoint_1b = False
+while checkpoint_1b == False:
+    temp_save = input(slow("Enter position number of dice you'd like to save. 1st die is 1, 2nd die is 2, 3rd die is 3 etc. There MUST be a space in between each number. Example of correct format: 1 3 5 \n"))
+    saves1 = SaveRoll(temp_save)
+    print('')
 
 
         
         #3rd while loop ensures only valid input is entered when asked "You have chosen the dice {saves1.printrolls()}. Is that correct?". If anything other than yes or no is entered, it will loop back here.
-        round1_quest = ''
-        checkpoint_1c = False
-        while checkpoint_1c == False:
-            round1_quest = input(slow(f'You have chosen the dice {saves1.printrolls()}. Is that correct? ' + f'yes or no?' + '\n'))
-            print('')
+    round1_quest = ''
+    checkpoint_1c = False
+    while checkpoint_1c == False:
+        round1_quest = input(slow(f'You have chosen the dice {saves1.printrolls()}. Is that correct? ' + f'yes or no?' + '\n'))
+        print('')
 
 
             
-            #When user confirms their die choice(s), input traverses through two if statements with the help of sort(). The first sort(reverse=True) will check the highest value at [0] and if its higher than 5 it will ask to re-enter die choice(s), 2nd if statement will use sort() to check lowest value at [0] and if it is lower than 1 user will have to re-enter die choice(s)
-            if round1_quest in ('yes', 'Yes'):
-                input_check = temp_save.split()
-                input_check.sort(reverse=True) 
-                if int(input_check[0]) > 5:
-                    slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')   
-                    checkpoint_1b = False
-                    checkpoint_1c = True
-                else:
-                    input_check.sort()
-                    if int(input_check[0]) < 1:
-                        slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')
-                        checkpoint_1b = False
-                        checkpoint_1c = True
-                    else:
-                        checkpoint_1b = True
-                        checkpoint_1c = True
-            elif round1_quest in ('no', 'No'):
-                checkpoint_1b = False
-                checkpoint_1c = True
-            else:
-                pass
-                
-                
-                
-        #if statement ensures correct amount of die chosen, followed by a try and except statement for any non_integer values.
-        if len(temp_save) in range (1,10):
+            #When user confirms their die choice(s), input traverses through multiple if and try statements to begin another series of checkpoints
+        if round1_quest in ('yes', 'Yes'):
+            #splits user input, then proceeds through try statement to convert all string values into integer values, and finally uses the sort(Reverse=True) function to sort in descending order.
+            input_check = temp_save.split()
             try:
                 for i in range(0,len(input_check)):
                     input_check[i] = int(input_check[i])
-                    checkpoint_1a = True
+                input_check.sort(reverse=True)
+                #2nd try statement created to handle an empty list, an empty input creates and empty list meaning user wants to reroll all values. This causes an index error, therefore program sends input to (except IndexError:) and program allows it to pass all checkpoints.
+                try:
+                    #Verifys sorted list element [0] is within 5 as only 5 dice are available
+                    if int(input_check[0]) > 5:
+                        slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')   
+                        checkpoint_1b = False
+                        checkpoint_1c = True
+                    #Resorts list in ascending order and verifys that list element [0] is more 1 than 1 as there is no die 0.'
+                    else:
+                        input_check.sort()
+                        if int(input_check[0]) < 1:
+                            slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')
+                            checkpoint_1b = False
+                            checkpoint_1c = True
+                        #Verifys input is not longer than 10 characters, this is to prevent more than 5 dice choices.
+                        else:
+                            if len(temp_save) in range (1,10):
+                                checkpoint_1b = True
+                                checkpoint_1c = True
+                            elif len(temp_save) > 9:
+                                slow('Invalid die amount or too many spaces in between numbers detected.\n Please enter numbers with only one space in between')
+                                checkpoint_1b = False
+                                checkpoint_1c = True
+                #2nd try statement exception
+                except IndexError:
+                    pass
+            #1st die statement exception:
             except ValueError:
                 slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
-                checkpoint_1a = False
-        elif len(temp_save) > 9:
-            slow('Number of die chosen exceeded, only 5 allowed or too many spaces in between each number detected.\n')
-            
+                checkpoint_1b = False
+                checkpoint_1c = True
+            #1st die statement exception
+            except TypeError:
+                slow('Please re-enter selection only using numbers 1 - 5 representing 1st, 2nd, 3rd, 4th, 5th die. \n')
+                checkpoint_1b = False
+                checkpoint_1c = True
+            #If user did not enter any input, this will push it through all checkpoints and reroll all die.
+            if len(temp_save) == 0:
+                checkpoint_1b = True
+                checkpoint_1c = True
+                
+        #Handles no for the checkpoint_1b
+        elif round1_quest in ('no', 'No'):
+            checkpoint_1b = False
+            checkpoint_1c = True
+        #If no input submitted for checkpoint_1b, this will cause a loop.
         else:
-            checkpoint_1a = True
+            pass
+            
+            
             
         
         
@@ -190,53 +205,61 @@ print('')
 
     
     
-checkpoint_2a = False
-while checkpoint_2a == False:
-    checkpoint_2b = False
-    while checkpoint_2b == False:
-        temp_save2 = input(slow("Enter position number of dice you'd like to save 1st die is 1, 2nd die is 2, 3rd die is 3 etc. There MUST be a space in between each number. Example of correct format: 1 3 5 \n"))
-        saves2 = SaveRoll(temp_save2)
+checkpoint_2b = False
+while checkpoint_2b == False:
+    temp_save = input(slow("Enter position number of dice you'd like to save. 1st die is 1, 2nd die is 2, 3rd die is 3 etc. There MUST be a space in between each number. Example of correct format: 1 3 5 \n"))
+    saves2 = SaveRoll(temp_save)
+    print('')
+    round2_quest = ''
+    checkpoint_2c = False
+    while checkpoint_2c == False:
+        round2_quest = input(slow(f'You have chosen the dice {saves2.printrolls()}. Is that correct? ' + f'yes or no?' + '\n'))
         print('')
-        round2_quest = ''
-        checkpoint_2c = False
-        while checkpoint_2c == False:
-            round2_quest = input(slow(f'You have chosen the dice {saves2.printrolls()}. Is that correct? ' + f'yes or no?' + '\n'))
-            print('')
-            if round2_quest in ('yes', 'Yes'):
-                input_check = temp_save2.split()
-                input_check.sort(reverse=True) 
-                if int(input_check[0]) > 5:
-                    slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')   
-                    checkpoint_2b = False
-                    checkpoint_2c = True
-                else:
-                    input_check.sort()
-                    if int(input_check[0]) < 1:
-                        slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')
+        if round2_quest in ('yes', 'Yes'):
+            input_check = temp_save.split()
+            try:
+                for i in range(0,len(input_check)):
+                    input_check[i] = int(input_check[i])
+                input_check.sort(reverse=True)
+                try:
+                    if int(input_check[0]) > 5:
+                        slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')   
                         checkpoint_2b = False
                         checkpoint_2c = True
                     else:
-                        checkpoint_2b = True
-                        checkpoint_2c = True
-            elif round2_quest in ('no', 'No'):
-                checkpoint_2b = False
-                checkpoint_2c = True
-            else:
-                pass
-
-        if len(temp_save2) in range (1,10):
-            try:
-                input_check = temp_save2.split()
-                for i in range(0,len(input_check)):
-                    input_check[i] = int(input_check[i])
-                    checkpoint_2a = True
+                        input_check.sort()
+                        if int(input_check[0]) < 1:
+                            slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')
+                            checkpoint_2b = False
+                            checkpoint_2c = True
+                        else:
+                            if len(temp_save) in range (1,10):
+                                checkpoint_2b = True
+                                checkpoint_2c = True
+                            elif len(temp_save) > 9:
+                                slow('Invalid die amount or too many spaces in between numbers detected.\n Please enter numbers with only one space in between')
+                                checkpoint_2b = False
+                                checkpoint_2c = True
+                except IndexError:
+                    pass
             except ValueError:
                 slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
-                checkpoint_2a = False
-        elif len(temp_save) > 9:
-            slow('Number of die chosen exceeded, only 5 allowed.\n')
+                checkpoint_2b = False
+                checkpoint_2c = True
+            except TypeError:
+                slow('Please re-enter selection only using numbers 1 - 5 representing 1st, 2nd, 3rd, 4th, 5th die. \n')
+                checkpoint_2b = False
+                checkpoint_2c = True
+            if len(temp_save) == 0:
+                checkpoint_2b = True
+                checkpoint_2c = True
+        elif round2_quest in ('no', 'No'):
+            checkpoint_2b = False
+            checkpoint_2c = True
         else:
-            checkpoint_2a = True
+            pass
+
+
 
 #Since rolls were moved to the list(init_dicerolls), the function(saveroll()) uses init_dicerolls as the main data list, which then begins to append any saved rolls back to the now empty temp_rolls list 
 temp_rolls = []
@@ -266,53 +289,59 @@ print('')
 
 
     
-checkpoint_3a = False
-while checkpoint_3a == False:
-    checkpoint_3b = False
-    while checkpoint_3b == False:
-        temp_save3 = input(slow("Enter position number of dice you'd like to save 1st die is 1, 2nd die is 2, 3rd die is 3 etc. There MUST be a space in between each number. Example of correct format: 1 3 5 \n"))
-        saves3 = SaveRoll(temp_save3)
+checkpoint_3b = False
+while checkpoint_3b == False:
+    temp_save = input(slow("Enter position number of dice you'd like to save. 1st die is 1, 2nd die is 2, 3rd die is 3 etc. There MUST be a space in between each number. Example of correct format: 1 3 5 \n"))
+    saves3 = SaveRoll(temp_save)
+    print('')
+    round3_quest = ''
+    checkpoint_3c = False
+    while checkpoint_3c == False:
+        round3_quest = input(slow(f'You have chosen the dice {saves3.printrolls()}. Is that correct? ' + f'yes or no?' + '\n'))
         print('')
-        round3_quest = ''
-        checkpoint_3c = False
-        while checkpoint_3c == False:
-            round3_quest = input(slow(f'You have chosen the dice {saves3.printrolls()}. Is that correct? ' + f'yes or no?' + '\n'))
-            print('')
-            if round3_quest in ('yes', 'Yes'):
-                input_check = temp_save.split()
-                input_check.sort(reverse=True) 
-                if int(input_check[0]) > 5:
-                    slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')   
-                    checkpoint_3b = False
-                    checkpoint_3c = True
-                else:
-                    input_check.sort()
-                    if int(input_check[0]) < 1:
-                        slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')
+        if round3_quest in ('yes', 'Yes'):
+            input_check = temp_save.split()
+            try:
+                for i in range(0,len(input_check)):
+                    input_check[i] = int(input_check[i])
+                input_check.sort(reverse=True)
+                try:
+                    if int(input_check[0]) > 5:
+                        slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')   
                         checkpoint_3b = False
                         checkpoint_3c = True
                     else:
-                        checkpoint_3b = True
-                        checkpoint_3c = True
-            elif round3_quest in ('no', 'No'):
-                checkpoint_3b = False
-                checkpoint_3c = True
-            else:
-                pass
-
-        if len(temp_save3) in range (1,10):
-            try:
-                input_check = temp_save.split()
-                for i in range(0,len(input_check)):
-                    input_check[i] = int(input_check[i])
-                    checkpoint_3a = True
+                        input_check.sort()
+                        if int(input_check[0]) < 1:
+                            slow('Only numbers 1 - 5 can be chosen, if you wish to not save any dice leave response blank and press enter. \n')
+                            checkpoint_3b = False
+                            checkpoint_3c = True
+                        else:
+                            if len(temp_save) in range (1,10):
+                                checkpoint_3b = True
+                                checkpoint_3c = True
+                            elif len(temp_save) > 9:
+                                slow('Invalid die amount or too many spaces in between numbers detected.\n Please enter numbers with only one space in between')
+                                checkpoint_3b = False
+                                checkpoint_3c = True
+                except IndexError:
+                    pass
             except ValueError:
                 slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
-                checkpoint_1a = False
-        elif len(temp_save) > 9:
-            slow('Number of die chosen exceeded, only 5 allowed.\n')
+                checkpoint_3b = False
+                checkpoint_3c = True
+            except TypeError:
+                slow('Please re-enter selection only using numbers 1 - 5 representing 1st, 2nd, 3rd, 4th, 5th die. \n')
+                checkpoint_3b = False
+                checkpoint_3c = True
+            if len(temp_save) == 0:
+                checkpoint_3b = True
+                checkpoint_3c = True
+        elif round3_quest in ('no', 'No'):
+            checkpoint_3b = False
+            checkpoint_3c = True
         else:
-            checkpoint_3a = True
+            pass
             
 temp_rolls = []
 saves3.saveroll()
@@ -335,6 +364,3 @@ init_dicerolls = temp_rolls
 init_dicerolls.sort()
 slow(f'Your final rolls are: {init_dicerolls}')
 print('')
-
-
-slow(f'Congratulations you have finished your final roll. ')
