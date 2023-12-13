@@ -153,7 +153,7 @@ while checkpoint_1b == False:
                     pass
             #1st die statement exception:
             except ValueError:
-                slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
+                slow('Please retype valid die choices with a space between each number. EX: 1 4 3 or 1 4 5 2\n')
                 checkpoint_1b = False
                 checkpoint_1c = True
             #1st die statement exception
@@ -243,7 +243,7 @@ while checkpoint_2b == False:
                 except IndexError:
                     pass
             except ValueError:
-                slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
+                slow('Please retype valid die choices with a space between each number. EX: 1 4 3 or 1 4 5 2\n')
                 checkpoint_2b = False
                 checkpoint_2c = True
             except TypeError:
@@ -327,7 +327,7 @@ while checkpoint_3b == False:
                 except IndexError:
                     pass
             except ValueError:
-                slow('Please retype valid die choices with a space between each number. EX: 1 4 6 or 1 4 5 6\n')
+                slow('Please retype valid die choices with a space between each number. EX: 1 4 3 or 1 4 5 2\n')
                 checkpoint_3b = False
                 checkpoint_3c = True
             except TypeError:
